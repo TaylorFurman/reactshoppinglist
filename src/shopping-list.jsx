@@ -1,6 +1,8 @@
 import react from 'react';
 import { connect } from 'react-redux';
 
+import {Link} from 'react-router-dom';
+
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -10,7 +12,21 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 
+import {toggleInCart} from './actions.js';
+
 class ShoppingList extends (react.Component) {
+	handleChange(event, index) {
+		this.props.toggleInCart({index});
+	}
+
+	strikeStyle(index) {
+		if (this.props.shopping_list[index].in_cart) {
+			return {textDecoration: 'line-through'};
+		}
+
+		return {};
+	}
+
 	render() {
 		return (
 			<Card style={{maxWidth: '500px', margin: '30px auto'}}>
@@ -22,18 +38,19 @@ class ShoppingList extends (react.Component) {
 					        control={
 					          <Checkbox
 					            checked={item.in_cart}
-					            // onChange={handleChange}
+					            onChange={(e) => this.handleChange(e, index)}
 					            color="primary"
 					          />
 					        }
 					        label={item.name}
+					        style={this.strikeStyle(index)}
 					      />
 						  </ListItem>;
 						})}
 					</List>
 				</CardContent>
 				<CardActions>
-					<Button>Add Item</Button>
+					<Button component={Link} to="/add">Add Item</Button>
 				</CardActions>
 			</Card>
 		);
@@ -44,5 +61,13 @@ function mapStateToProps (state) {
 	return {shopping_list: state.shopping_list};
 }
 
-var ConnectedShoppingList = connect(mapStateToProps)(ShoppingList);
+function mapDispatchToProps (dispatch) {
+	return {
+    toggleInCart: function (data) {
+      dispatch(toggleInCart(data))
+    }
+  }
+}
+
+var ConnectedShoppingList = connect(mapStateToProps, mapDispatchToProps)(ShoppingList);
 export default ConnectedShoppingList;
